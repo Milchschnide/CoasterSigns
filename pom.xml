@@ -6,7 +6,7 @@
 
     <groupId>milchschnide</groupId>
     <artifactId>CoasterSigns</artifactId>
-    <version>0.0.0</version>
+    <version>0.1.0</version>
     <packaging>jar</packaging>
 
     <name>CoasterSigns</name>
@@ -55,6 +55,10 @@
             <id>papermc-repo</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>MG-Dev Jenkins CI Maven Repository</id>
+            <url>https://ci.mg-dev.eu/plugin/repository/everything</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -62,6 +66,24 @@
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
             <version>1.21.3-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.bergerkiller.bukkit</groupId>
+            <artifactId>BKCommonLib</artifactId>
+            <version>LATEST</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.bergerkiller.bukkit</groupId>
+            <artifactId>TrainCarts</artifactId>
+            <version>LATEST</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

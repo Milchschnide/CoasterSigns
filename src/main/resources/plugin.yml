@@ -2,3 +2,5 @@ name: CoasterSigns
 version: '0.0.0'
 main: milchschnide.coasterSigns.CoasterSigns
 api-version: '1.21'
+
+dependencies: [Train_Carts,BKCommonLib]
