@@ -40,14 +40,6 @@ public final class CoasterSigns extends JavaPlugin {
         ConfigHandler.loadDefaults();
         System.out.println("[CoasterSigns] Configuration initialized");
 
-        System.out.println("defaultFriction: " + defaultFriction);
-        System.out.println("defaultGravity: " + defaultGravity);
-        System.out.println("defaultTravelSpeed: " + defaultTravelSpeed);
-        System.out.println("defaultBrakeDistance: " + defaultBrakeDistance);
-        System.out.println("defaultLaunchSpeed: " + defaultLaunchSpeed);
-        System.out.println("defaultLaunchDistance: " + defaultLaunchDistance);
-        System.out.println("defaultWaitTime: " + defaultWaitTime);
-
         // Register sign actions
         System.out.println("[CoasterSigns] Enabled");
         System.out.println("[CoasterSigns] Loading CoasterSigns");
