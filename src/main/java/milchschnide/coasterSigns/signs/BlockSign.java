@@ -3,7 +3,7 @@ package milchschnide.coasterSigns.signs;
 import com.bergerkiller.bukkit.tc.events.SignActionEvent;
 import com.bergerkiller.bukkit.tc.events.SignChangeActionEvent;
 import com.bergerkiller.bukkit.tc.signactions.SignAction;
-import milchschnide.coasterSigns.core.CoasterCHACHE;
+import milchschnide.coasterSigns.core.coaster.CoasterCHACHE;
 
 public class BlockSign extends SignAction {
     @Override

@@ -47,6 +47,7 @@ public final class ConfigHandler {
         conf.addDefault("defaults.launch.speed", 50);
         conf.addDefault("defaults.launch.distance", 20);
         conf.addDefault("defaults.launch.waitTime", 3);
+        conf.addDefault("defaults.station.countDownTime", 10);
         conf.options().copyDefaults(true);
         try {
             conf.save(configPath);
@@ -67,6 +68,7 @@ public final class ConfigHandler {
         CoasterSigns.defaultLaunchSpeed = (configuration.getDouble("defaults.launch.speed") / 3.6) / 20;
         CoasterSigns.defaultLaunchDistance = configuration.getDouble("defaults.launch.distance");
         CoasterSigns.defaultWaitTime = configuration.getDouble("defaults.launch.waitTime");
+        CoasterSigns.defaultCountDownTime = configuration.getInt("defaults.station.countDownTime");
     }
 
 }

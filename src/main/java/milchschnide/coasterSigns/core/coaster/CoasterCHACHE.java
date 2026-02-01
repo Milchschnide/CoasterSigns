@@ -1,4 +1,4 @@
-package milchschnide.coasterSigns.core;
+package milchschnide.coasterSigns.core.coaster;
 
 import java.util.ArrayList;
 import java.util.List;

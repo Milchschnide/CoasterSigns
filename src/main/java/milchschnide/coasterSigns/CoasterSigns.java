@@ -23,6 +23,10 @@ public final class CoasterSigns extends JavaPlugin {
 
     public static double defaultWaitTime;
 
+    public static int defaultCountDownTime;
+
+    public static StationSign stationSign = new StationSign();
+
 
     @Override
     public void onEnable() {
@@ -47,6 +51,16 @@ public final class CoasterSigns extends JavaPlugin {
         System.out.println("Loaded CoasterSigns");
 
         //TODO: Experimental
-        SignAction.register(new StationSign());
+        SignAction.register(stationSign);
+    }
+
+    @Override
+    public void onLoad() {
+        SignAction.register(stationSign);
+    }
+
+    @Override
+    public void onDisable() {
+        SignAction.unregister(stationSign);
     }
 }
