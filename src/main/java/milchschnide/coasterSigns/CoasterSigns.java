@@ -1,10 +1,7 @@
 package milchschnide.coasterSigns;
 
 import com.bergerkiller.bukkit.tc.signactions.SignAction;
-import milchschnide.coasterSigns.signs.BrakeSign;
-import milchschnide.coasterSigns.signs.EnablePhysiksSign;
-import milchschnide.coasterSigns.signs.FreeFallReleaseSign;
-import milchschnide.coasterSigns.signs.HoldAndLaunchSign;
+import milchschnide.coasterSigns.signs.*;
 import milchschnide.coasterSigns.utils.ConfigHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -32,21 +29,24 @@ public final class CoasterSigns extends JavaPlugin {
         instance = this;
 
         // Initialize configuration
-        System.out.println("[CoasterSigns] Initializing configuration");
+        System.out.println("Initializing configuration");
         ConfigHandler.initConfig(instance.getDataFolder());
 
         // Load default values from configuration
-        System.out.println("[CoasterSigns] Loading default configuration values");
+        System.out.println("Loading default configuration values");
         ConfigHandler.loadDefaults();
-        System.out.println("[CoasterSigns] Configuration initialized");
+        System.out.println("Configuration initialized");
 
         // Register sign actions
-        System.out.println("[CoasterSigns] Enabled");
-        System.out.println("[CoasterSigns] Loading CoasterSigns");
+        System.out.println("Enabled");
+        System.out.println("Loading CoasterSigns");
         SignAction.register(new EnablePhysiksSign());
         SignAction.register(new BrakeSign());
         SignAction.register(new HoldAndLaunchSign());
         SignAction.register(new FreeFallReleaseSign());
-        System.out.println("[CoasterSigns] Loaded CoasterSigns");
+        System.out.println("Loaded CoasterSigns");
+
+        //TODO: Experimental
+        SignAction.register(new StationSign());
     }
 }
