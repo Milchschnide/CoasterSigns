@@ -1,5 +1,6 @@
 package milchschnide.coasterSigns.core.coaster;
 
+import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
 import milchschnide.coasterSigns.CoasterSigns;
 import org.bukkit.Bukkit;
 
@@ -12,24 +13,24 @@ public class CountDownHandler {
         this.coaster = coaster;
     }
 
-    public void startCountdown() {
+    public void startCountdown(MinecartGroup group) {
         countdownTime = CoasterSigns.defaultCountDownTime + 1;
-        countdownTick();
+        countdownTick(group);
     }
 
-    private void countdownTick() {
+    private void countdownTick(MinecartGroup group) {
         countdownTime--;
         if(!isCountingDown) return;
         if (countdownTime <= 0) {
-            closeGatesAndRestraints();
+            closeGatesAndRestraints(group);
             return;
         }
-        Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance, this::countdownTick, 20L);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance,() -> countdownTick(group), 20L);
     }
 
-    private void closeGatesAndRestraints() {
+    private void closeGatesAndRestraints(MinecartGroup group) {
         coaster.closeGates();
-        coaster.closeRestraints();
+        coaster.closeRestraints(group);
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance, this::launchTrain, 60L);
     }
