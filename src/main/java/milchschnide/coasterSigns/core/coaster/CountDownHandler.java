@@ -14,6 +14,7 @@ public class CountDownHandler {
     }
 
     public void startCountdown(MinecartGroup group) {
+        isCountingDown = true;
         countdownTime = CoasterSigns.defaultCountDownTime + 1;
         countdownTick(group);
     }
@@ -37,7 +38,7 @@ public class CountDownHandler {
 
     private void launchTrain() {
         coaster.launchTrain();
-        isCountingDown = false;
+        Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance, this::stopCountdown, 20L);
     }
 
     public void stopCountdown() {
