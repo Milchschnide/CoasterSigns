@@ -40,13 +40,12 @@ public class StationSign extends TrainCartsSignAction {
             final int[] task = {0};
             task[0] = Bukkit.getScheduler().scheduleSyncRepeatingTask(CoasterSigns.instance, () -> {
                 if (group.head().getRealSpeed() == 0) {
-                    if (!group.hasPassenger()) checkPreviouseBlock(coaster, group);
+                    if (group.hasPassenger()) checkPreviouseBlock(coaster, group);
 
                     coaster.openGates();
                     coaster.openRestraints(group);
                     group.eject();
 
-                    checkPreviouseBlock(coaster, group);
                     //Task beenden
                     Bukkit.getScheduler().cancelTask(task[0]);
                 }
@@ -63,10 +62,9 @@ public class StationSign extends TrainCartsSignAction {
     }
 
     private void checkPreviouseBlock(Coaster coaster, MinecartGroup group) {
-        if (coaster.getBlocks().isEmpty()) {
+        if (!coaster.getBlocks().isEmpty()) {
             if (coaster.getBlocks().getFirst().isTrainWaitingToEnter()) {
                 coaster.startCountDown(group, true, 0);
-                return;
             }
         }
     }
@@ -78,6 +76,22 @@ public class StationSign extends TrainCartsSignAction {
                 .setName("Coaster Station Sign")
                 .setDescription("Acts as an advanced station for coasters")
                 .handle(event);
+    }
+
+    @Override
+    public void destroy(SignActionEvent event) {
+        final Coaster coaster = CoasterCHACHE.getCoasterCHACHE().stream().filter(coaster1 ->
+                coaster1.name().equals(event.getLine(2))).findFirst().orElse(null);
+        if (coaster == null) {
+            SignUtilsHandler.sendMessage(null, "A coaster with the name '"
+                    + event.getLine(2) + "' does not exist!");
+            return;
+        }
+        if (coaster.isTrainInStation()) {
+            SignUtilsHandler.sendMessage(null, "Cannot delete the station sign while a train is in the station!");
+            return;
+        }
+        coaster.deleteCoaster();
     }
 
     @Override

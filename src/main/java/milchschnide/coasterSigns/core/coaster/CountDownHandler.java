@@ -18,7 +18,7 @@ public class CountDownHandler {
     public void startCountdown(MinecartGroup group) {
         isCountingDown = true;
         countdownTime = CoasterSigns.defaultCountDownTime + 1;
-        if (!coaster.getBlocks().isEmpty() && coaster.getBlocks().getLast().isTrainInBlock()) {
+        if (coaster.getLastDispatchedTrain() != null) {
             waitTillNextBlockIsFree(group, 0);
             return;
         }
@@ -37,7 +37,7 @@ public class CountDownHandler {
         }
         Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance, () -> {
             if (!isCountingDown) return;
-            if (coaster.getBlocks().getLast() != null && coaster.getBlocks().getLast().isTrainInBlock()) {
+            if (coaster.getLastDispatchedTrain() != null) {
                 waitTillNextBlockIsFree(group, finalMaxTimeToWait);
             } else {
                 countdownTick(group);

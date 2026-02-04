@@ -8,17 +8,23 @@ import com.bergerkiller.bukkit.tc.signactions.SignAction;
 import com.bergerkiller.bukkit.tc.signactions.SignActionType;
 import com.bergerkiller.bukkit.tc.utils.SignBuildOptions;
 import milchschnide.coasterSigns.CoasterSigns;
-import milchschnide.coasterSigns.core.Block;
+import milchschnide.coasterSigns.core.block.Block;
 import milchschnide.coasterSigns.core.coaster.Coaster;
 import milchschnide.coasterSigns.core.coaster.CoasterCHACHE;
 import milchschnide.coasterSigns.signs.utils.SignUtilsHandler;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BlockSign extends SignAction {
+    public static final List<SignActionEvent> posibleBlocks = new ArrayList<>();
+
     @Override
     public boolean match(SignActionEvent event) {
-        return CoasterCHACHE.getCoasterCHACHE().stream().anyMatch(coaster -> event.isType(coaster.name()));
+        if(CoasterSigns.collectblocks) posibleBlocks.add(event);
+        return isblockSign(event);
     }
 
     @Override
@@ -46,6 +52,8 @@ public class BlockSign extends SignAction {
 
             final Station station = new Station(event);
             block.setDirection(station.getNextDirectionFace());
+
+            if(event.getMember() == coaster.getLastDispatchedTrain()) coaster.setLastDispatchedTrain(null);
 
             if (block.isTrainInBlock()) {
                 block.setTrainWaitingToEnter(event.getMember());
@@ -75,6 +83,10 @@ public class BlockSign extends SignAction {
         super.loadedChanged(event, initBlock(event, null));
     }
 
+    public boolean isblockSign(SignActionEvent event) {
+        return CoasterCHACHE.getCoasterCHACHE().stream().anyMatch(coaster -> event.isType(coaster.name()));
+    }
+
     private boolean initBlock(SignActionEvent event, Player player) {
         if (event.getLine(1).isEmpty()) {
             SignUtilsHandler.sendMessage(player, " You must specify a caoster and block index on line 3!" +
@@ -100,13 +112,14 @@ public class BlockSign extends SignAction {
         final Coaster coaster = CoasterCHACHE.getCoasterCHACHE().stream()
                 .filter(coaster1 -> coaster1.name().equals(coasterName)).findFirst().orElseThrow();
 
-        System.out.println("Creating block for coaster: " + coaster.name() + " with index: " + line2[1]);
-
         int index;
         try {
             index = Integer.parseInt(line2[1]);
         } catch (NumberFormatException e) {
             SignUtilsHandler.sendMessage(player, " Invalid block index on line 3! It must be a number.");
+            return false;
+        }
+        if(coaster.getBlocks().stream().anyMatch(block -> block.getIndex() == index)) {
             return false;
         }
         if (coaster.getBlocks().stream().anyMatch(block1 -> block1.getIndex() == index)) {

@@ -43,9 +43,22 @@ public final class CoasterSigns extends JavaPlugin {
 
     public static BlockSign blockSign = new BlockSign();
 
+    public static boolean collectblocks = true;
 
     @Override
     public void onEnable() {
+        System.out.println("Load Blocks");
+        Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> {
+            collectblocks = false;
+            BlockSign.posibleBlocks.forEach(block -> {
+                if (!blockSign.isblockSign(block)) return;
+                blockSign.loadedChanged(block, false);
+            });
+        }, 5);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> collectblocks = false, 20);
+        System.out.println("Loaded Blocks");
+
+
         world = Bukkit.getWorld("world");
         if (world == null) {
             System.out.println("World 'world' not found! Disabling plugin.");
@@ -67,6 +80,7 @@ public final class CoasterSigns extends JavaPlugin {
     @Override
     public void onLoad() {
         instance = this;
+        // Queue initialisieren
 
         // Initialize configuration
         System.out.println("Initializing configuration");
@@ -77,10 +91,10 @@ public final class CoasterSigns extends JavaPlugin {
         ConfigHandler.loadDefaults();
         System.out.println("Configuration initialized");
 
-        System.out.println("Pre-loading CoasterSigns");
+        System.out.println("Pre-loading StationSign");
         SignAction.register(stationSign);
         SignAction.register(blockSign);
-        System.out.println("Pre-loaded CoasterSigns");
+        System.out.println("Pre-loaded StationSign");
     }
 
     @Override
@@ -88,4 +102,5 @@ public final class CoasterSigns extends JavaPlugin {
         SignAction.unregister(stationSign);
         SignAction.unregister(blockSign);
     }
+
 }

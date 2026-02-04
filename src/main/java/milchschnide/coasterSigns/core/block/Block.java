@@ -1,4 +1,4 @@
-package milchschnide.coasterSigns.core;
+package milchschnide.coasterSigns.core.block;
 
 import com.bergerkiller.bukkit.tc.Station;
 import com.bergerkiller.bukkit.tc.controller.MinecartMember;
@@ -66,10 +66,12 @@ public class Block {
         if (previous.isTrainWaitingToEnter()) {
             Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance,
                     previous::launchTrain, CoasterSigns.defaultPreviousBlockLaunchDelay);
+            System.out.println("Previous block launched train after delay.");
         } else {
             previous.setTrainOnBlock(null);
             Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance, () ->
                     setPreviousBlockFree(previous), CoasterSigns.defaultPreviousBlockLaunchDelay);
+            System.out.println("Previous block cleared after delay.");
         }
     }
 

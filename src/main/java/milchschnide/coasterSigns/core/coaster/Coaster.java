@@ -7,7 +7,7 @@ import com.bergerkiller.bukkit.tc.properties.TrainProperties;
 import lombok.Getter;
 import lombok.Setter;
 import milchschnide.coasterSigns.CoasterSigns;
-import milchschnide.coasterSigns.core.Block;
+import milchschnide.coasterSigns.core.block.Block;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -30,6 +30,9 @@ public class Coaster {
     private PassThroughHandler passThroughHandler = null;
     @Setter
     private MinecartMember<?> trainInStation;
+    @Setter
+    @Getter
+    private MinecartMember<?> lastDispatchedTrain;
     private boolean gatesClosed = false;
     @Setter
     private org.bukkit.block.Block block;
@@ -42,9 +45,13 @@ public class Coaster {
     }
 
     public Coaster init() {
-        System.out.println("Initialized coaster " + name());
         CoasterCHACHE.addCoaster(this);
         return this;
+    }
+
+    public void deleteCoaster() {
+        blocks.clear();
+        CoasterCHACHE.removeCoaster(this);
     }
 
     public String name() {
@@ -85,20 +92,10 @@ public class Coaster {
         if (trainInStation == null) throw new IllegalStateException("Train has not been set");
         trainInStation.getActions()
                 .addActionLaunch(direction, stationConfig.getLaunchConfig(), stationConfig.getLaunchSpeed());
-        setWaitingOnNextBlock(trainInStation);
+        lastDispatchedTrain = trainInStation;
         Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance,
                 this::clearPreviousBlocks, CoasterSigns.defaultPreviousBlockLaunchDelay);
         trainInStation = null;
-    }
-
-    /**
-     * Sets the given member as waiting on the next block of this coaster
-     * this is used to know when the next train can dispatch from the station
-     * @param member Member to set as waiting
-     */
-    private void setWaitingOnNextBlock(MinecartMember<?> member) {
-        if (blocks.isEmpty()) return;
-        blocks.getLast().setTrainWaitingToEnter(member);
     }
 
     private void clearPreviousBlocks() {
@@ -107,13 +104,13 @@ public class Coaster {
         if (previousBlock.isTrainWaitingToEnter()){
             previousBlock.launchTrain();
         } else {
+            previousBlock.setPreviousBlockFree();
             previousBlock.setTrainOnBlock(null);
         }
     }
 
     public void startCountDown(MinecartGroup group, boolean forceStart, int i) {
-        if(blocks.getLast() != null) {
-            if(blocks.getLast().isTrainWaitingToEnter()) {
+            if(lastDispatchedTrain != null) {
                 countDownHandler.sendActionBarMessage(group,
                         Component.text(CoasterSigns.defaultNextBlockIsOccupiedMessage));
                 if(!forceStart) return;
@@ -128,12 +125,13 @@ public class Coaster {
                 });
                 return;
             }
-        }
         if (!isTrainInStation()) return;
         if(forceStart) {
             countDownHandler.closeGatesAndRestraints(trainInStation.getGroup());
+            System.out.println("Force start count down");
             return;
         }
+        System.out.println("Start Countdown");
         countDownHandler.startCountdown(group);
     }
 
@@ -148,8 +146,8 @@ public class Coaster {
     }
 
     public void addBlock(Block block) {
+        if(blocks.stream().anyMatch(block1 -> block1.getIndex() == block.getIndex())) return;
         blocks.add(block);
-        System.out.println("Added block with index " + block.getIndex() + " to coaster " + name());
         blocks.sort(Comparator.comparingInt(Block::getIndex));
     }
 
