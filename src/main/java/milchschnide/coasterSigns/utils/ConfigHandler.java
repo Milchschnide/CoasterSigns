@@ -48,6 +48,10 @@ public final class ConfigHandler {
         conf.addDefault("defaults.launch.distance", 20);
         conf.addDefault("defaults.launch.waitTime", 3);
         conf.addDefault("defaults.station.countDownTime", 10);
+        conf.addDefault("defaults.station.countDown.messagePartOne", "The train will depart in");
+        conf.addDefault("defaults.station.countDown.messagePartTwo", "second/s");
+        conf.addDefault("defaults.station.announcement.message", "Have a nice ride!");
+        conf.addDefault("defaults.station.announcement.nextBlockIsOccupied", "§cCountdown cancelled! §7Next block is still occupied.");
         conf.options().copyDefaults(true);
         try {
             conf.save(configPath);
@@ -69,6 +73,10 @@ public final class ConfigHandler {
         CoasterSigns.defaultLaunchDistance = configuration.getDouble("defaults.launch.distance");
         CoasterSigns.defaultWaitTime = configuration.getDouble("defaults.launch.waitTime");
         CoasterSigns.defaultCountDownTime = configuration.getInt("defaults.station.countDownTime");
+        CoasterSigns.defaultCountDownMessagePartOne = configuration.getString("defaults.station.countDown.messagePartOne");
+        CoasterSigns.defaultCountDownMessagePartTwo = configuration.getString("defaults.station.countDown.messagePartTwo");
+        CoasterSigns.defaultAnnouncementMessage = configuration.getString("defaults.station.announcement.message");
+        CoasterSigns.defaultNextBlockIsOccupiedMessage = configuration.getString("defaults.station.announcement.nextBlockIsOccupied");
     }
 
 }

@@ -8,13 +8,11 @@ import com.bergerkiller.bukkit.tc.signactions.SignActionType;
 import com.bergerkiller.bukkit.tc.signactions.TrainCartsSignAction;
 import com.bergerkiller.bukkit.tc.utils.SignBuildOptions;
 import milchschnide.coasterSigns.CoasterSigns;
+import milchschnide.coasterSigns.core.Block;
 import milchschnide.coasterSigns.core.coaster.Coaster;
 import milchschnide.coasterSigns.core.coaster.CoasterCHACHE;
 import milchschnide.coasterSigns.signs.utils.SignUtilsHandler;
-import milchschnide.coasterSigns.utils.Color;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
@@ -36,6 +34,7 @@ public class StationSign extends TrainCartsSignAction {
 
             final Station station = new Station(event);
             station.centerTrain();
+
             if (coaster.getDirection() == null) coaster.setDirection(station.getNextDirectionFace());
 
             //warte bis der zug steht
@@ -52,12 +51,9 @@ public class StationSign extends TrainCartsSignAction {
 
         } else if (event.isAction(SignActionType.GROUP_UPDATE)) {
             if (group.hasPassenger()) {
-                System.out.println("Passenger detectet.");
                 if (coaster.getCountDownHandler().isRunning()) return;
-                System.out.println("Starting countdown.");
-                coaster.startCountDown(group);
+                coaster.startCountDown(group,false,0);
             } else {
-                System.out.println("No passenger detectet, stopping countdown.");
                 coaster.stopCountDown();
             }
         }
@@ -79,17 +75,16 @@ public class StationSign extends TrainCartsSignAction {
 
     private boolean initCoaster(SignActionEvent event, Player player) {
         String name = null;
-        Block block = null;
+        org.bukkit.block.Block block = null;
         BlockFace direction = null;
         int passThrow = 0;
 
         final Station.StationConfig config = new Station.StationConfig();
-        config.setLaunchSpeed(CoasterSigns.defaultLaunchSpeed);
+        config.setLaunchSpeed(CoasterSigns.defaultTravelSpeed);
+        System.out.println("Default launch speed set for station set: " + CoasterSigns.defaultTravelSpeed);
 
-
-        if (event.getLine(2).isEmpty()){
-            SignUtilsHandler.sendMessage(player, Component.text("[CoasterSigns]", Color.CYAN.color)
-                    .append(Component.text("You must specify a name for the coaster on line 3!")));
+        if (event.getLine(2).isEmpty()) {
+            SignUtilsHandler.sendMessage(player, "You must specify a name for the coaster on line 3!");
             return false;
         }
         name = event.getLine(2);
@@ -104,13 +99,11 @@ public class StationSign extends TrainCartsSignAction {
                         final int z = Integer.parseInt(line4[2]);
                         block = event.getWorld().getBlockAt(x, y, z);
                     } catch (NumberFormatException e) {
-                        SignUtilsHandler.sendMessage(player, Component.text("[CoasterSigns]", Color.CYAN.color)
-                                .append(Component.text("Invalid coordinates on line 4! Expected format: x,y,z")));
+                        SignUtilsHandler.sendMessage(player, "Invalid coordinates on line 4! Expected format: x,y,z");
                         return false;
                     }
                 } else {
-                    SignUtilsHandler.sendMessage(player, Component.text("[CoasterSigns]", Color.CYAN.color)
-                            .append(Component.text("Invalid coordinates on line 4! Expected format: x,y,z")));
+                    SignUtilsHandler.sendMessage(player, "Invalid coordinates on line 4! Expected format: x,y,z");
                     return false;
                 }
             }
@@ -124,78 +117,35 @@ public class StationSign extends TrainCartsSignAction {
                     try {
                         direction = BlockFace.valueOf(line5[0].toUpperCase());
                     } catch (IllegalArgumentException e) {
-                        SignUtilsHandler.sendMessage(player, Component.text("[CoasterSigns]", Color.CYAN.color)
-                                .append(Component.text("Invalid direction on line 5! " +
-                                        "Expected a valid BlockFace value. [Bsp: north, south, east, west]")));
+                        SignUtilsHandler.sendMessage(player, "Invalid direction on line 5! " +
+                                "Expected a valid BlockFace value. [Bsp: north, south, east, west]");
                         return false;
                     }
                 } else if (line5.length == 2) {
                     try {
                         direction = BlockFace.valueOf(line5[0].toUpperCase());
                     } catch (IllegalArgumentException e) {
-                        SignUtilsHandler.sendMessage(player, Component.text("[CoasterSigns]", Color.CYAN.color)
-                                .append(Component.text("Invalid direction on line 5! " +
-                                        "Expected a valid BlockFace value. [Bsp: north, south, east, west]")));
+                        SignUtilsHandler.sendMessage(player, "Invalid direction on line 5! " +
+                                "Expected a valid BlockFace value. [Bsp: north, south, east, west]");
                         return false;
                     }
                     try {
                         passThrow = Integer.parseInt(line5[1]);
                     } catch (NumberFormatException e) {
-                        SignUtilsHandler.sendMessage(player, Component.text("[CoasterSigns]", Color.CYAN.color)
-                                .append(Component.text("Invalid speed on line 5! " +
-                                        "Expected a numeric value for pass throughs.")));
+                        SignUtilsHandler.sendMessage(player, "Invalid speed on line 5! " +
+                                "Expected a numeric value for pass throughs.");
                         return false;
                     }
                 } else {
-                    SignUtilsHandler.sendMessage(player, Component.text("[CoasterSigns]", Color.CYAN.color)
-                            .append(Component.text("Invalid parameters on line 5! Expected format: direction or direction,speed")));
+                    SignUtilsHandler.sendMessage(player, "Invalid parameters on line 5! Expected format:" +
+                            " direction or direction,speed");
                     return false;
                 }
             }
         }
 
         if (extraLinesBelow != null && extraLinesBelow.length == 2 && !extraLinesBelow[1].isEmpty()) {
-            String[] line6 = event.getExtraLinesBelow()[1].split(",");
-            if (line6.length > 0 && !line6[0].isEmpty()) {
-                if (line6.length == 1) {
-                    try {
-                        config.setLaunchSpeed(Double.parseDouble(line6[0]));
-                    } catch (NumberFormatException e) {
-                        SignUtilsHandler.sendMessage(player, Component.text("[CoasterSigns]", Color.CYAN.color)
-                                .append(Component.text("Invalid speed on line 6! " +
-                                        "Expected a numeric value for speed.")));
-                        return false;
-                    }
-                } else if (line6.length == 2) {
-                    try {
-                        config.setLaunchSpeed(Double.parseDouble(line6[0]));
-                    } catch (NumberFormatException e) {
-                        SignUtilsHandler.sendMessage(player, Component.text("[CoasterSigns]", Color.CYAN.color)
-                                .append(Component.text("Invalid speed on line 6! " +
-                                        "Expected a numeric value for speed.")));
-                        return false;
-                    }
-                    if (!SignUtilsHandler.validateLaunch(line6, player)) return false;
-                    if (line6[1].contains("m/s^2")) {
-                        // acceleration mode
-                        final String[] parts = line6[1].split("m");
-                        config.getLaunchConfig().setAcceleration(Double.parseDouble(parts[0]) / 400);
-                    } else if (line6[1].contains("g")) {
-                        // g-force mode
-                        final String[] parts = line6[1].split("g");
-                        config.getLaunchConfig().setAcceleration(((Double.parseDouble(parts[0]) * 785) / 80) / 400);
-                    } else {
-                        // distance mode
-                        final String[] parts = line6[1].split("m");
-                        config.getLaunchConfig().setDistance(Double.parseDouble(parts[0]));
-                    }
-                }
-            }
-            if (line6.length == 0 || line6[0].isEmpty() || line6.length == 1) {
-                config.getLaunchConfig().setDistance(2);
-            }
-        } else {
-            config.getLaunchConfig().setDistance(2);
+            SignUtilsHandler.checkPosibleLaunch(player, config, extraLinesBelow[1].split(","));
         }
 
         final Coaster coaster = new Coaster(name, config, direction).init();

@@ -7,8 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.sql.SQLOutput;
-
 public final class CoasterSigns extends JavaPlugin {
 
     public static CoasterSigns instance;
@@ -31,18 +29,42 @@ public final class CoasterSigns extends JavaPlugin {
 
     public static int defaultCountDownTime;
 
+    public static String defaultCountDownMessagePartOne;
+
+    public static String defaultCountDownMessagePartTwo;
+
+    public static String defaultAnnouncementMessage;
+
+    public static String defaultNextBlockIsOccupiedMessage;
+
     public static StationSign stationSign = new StationSign();
+
+    public static BlockSign blockSign = new BlockSign();
 
 
     @Override
     public void onEnable() {
-        instance = this;
         world = Bukkit.getWorld("world");
-        if(world == null) {
+        if (world == null) {
             System.out.println("World 'world' not found! Disabling plugin.");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
+
+        // Register sign actions
+        System.out.println("Loading CoasterSigns");
+        SignAction.register(new EnablePhysiksSign());
+        SignAction.register(new BrakeSign());
+        SignAction.register(new HoldAndLaunchSign());
+        SignAction.register(new FreeFallReleaseSign());
+        SignAction.register(stationSign);
+        SignAction.register(blockSign);
+        System.out.println("Loaded CoasterSigns");
+    }
+
+    @Override
+    public void onLoad() {
+        instance = this;
 
         // Initialize configuration
         System.out.println("Initializing configuration");
@@ -53,26 +75,15 @@ public final class CoasterSigns extends JavaPlugin {
         ConfigHandler.loadDefaults();
         System.out.println("Configuration initialized");
 
-        // Register sign actions
-        System.out.println("Enabled");
-        System.out.println("Loading CoasterSigns");
-        SignAction.register(new EnablePhysiksSign());
-        SignAction.register(new BrakeSign());
-        SignAction.register(new HoldAndLaunchSign());
-        SignAction.register(new FreeFallReleaseSign());
-        System.out.println("Loaded CoasterSigns");
-
-        //TODO: Experimental
+        System.out.println("Pre-loading CoasterSigns");
         SignAction.register(stationSign);
-    }
-
-    @Override
-    public void onLoad() {
-        SignAction.register(stationSign);
+        SignAction.register(blockSign);
+        System.out.println("Pre-loaded CoasterSigns");
     }
 
     @Override
     public void onDisable() {
         SignAction.unregister(stationSign);
+        SignAction.unregister(blockSign);
     }
 }
