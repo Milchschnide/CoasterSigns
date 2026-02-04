@@ -44,34 +44,63 @@ public class Coaster {
         this.direction = direction;
     }
 
+    /**
+     * Initializes the coaster by adding it to the global coaster cache.
+     *
+     * @return The initialized coaster.
+     */
     public Coaster init() {
         CoasterCHACHE.addCoaster(this);
         return this;
     }
 
+    /**
+     * Deletes the coaster by clearing its blocks and removing it from the global coaster cache.
+     */
     public void deleteCoaster() {
         blocks.clear();
         CoasterCHACHE.removeCoaster(this);
     }
 
+    /**
+     * Gets the name of the coaster.
+     *
+     * @return The name of the coaster.
+     */
     public String name() {
         return name;
     }
 
+    /**
+     * Checks if there is a train currently in the station.
+     *
+     * @return true if a train is in the station, false otherwise.
+     */
     public boolean isTrainInStation() {
         return trainInStation != null;
     }
 
+    /**
+     * Opens the station gates by changing the block type to TARGET.
+     */
     public void openGates() {
         if (block == null) return;
         block.setType(Material.TARGET);
     }
 
+    /**
+     * Closes the station gates by changing the block type to REDSTONE_BLOCK.
+     */
     public void closeGates() {
         if (block == null) return;
         block.setType(Material.REDSTONE_BLOCK);
     }
 
+    /**
+     * Opens the restraints of the given minecart group and prevents players from entering or exiting.
+     *
+     * @param group The minecart group whose restraints are to be opened.
+     */
     public void openRestraints(MinecartGroup group) {
         final TrainProperties properties = group.getProperties();
         properties.setPlayersEnter(false);
@@ -80,6 +109,11 @@ public class Coaster {
         group.playNamedAnimation("open_restraints");
     }
 
+    /**
+     * Closes the restraints of the given minecart group and prevents players from entering or exiting.
+     *
+     * @param group The minecart group whose restraints are to be closed.
+     */
     public void closeRestraints(MinecartGroup group) {
         final TrainProperties properties = group.getProperties();
         properties.setPlayersEnter(false);
@@ -88,6 +122,12 @@ public class Coaster {
         group.playNamedAnimation("close_restraints");
     }
 
+    /**
+     * Launches the train currently in the station.
+     * automatically clears previous blocks after a delay.
+     *
+     * @throws IllegalStateException if no train is set in the station.
+     */
     public void launchTrain() {
         if (trainInStation == null) throw new IllegalStateException("Train has not been set");
         trainInStation.getActions()
@@ -98,6 +138,10 @@ public class Coaster {
         trainInStation = null;
     }
 
+    /**
+     * Clears the previous blocks by launching any train waiting to enter
+     * or setting the previous block free if a train is on it.
+     */
     private void clearPreviousBlocks() {
         final Block previousBlock = blocks.getFirst();
         if (previousBlock == null) return;
@@ -109,6 +153,13 @@ public class Coaster {
         }
     }
 
+    /**
+     * Starts the countdown for the given minecart group.
+     *
+     * @param group      The minecart group for which to start the countdown.
+     * @param forceStart Whether to force start the countdown even if the next block is occupied.
+     * @param i          The current iteration count for checking block occupancy.
+     */
     public void startCountDown(MinecartGroup group, boolean forceStart, int i) {
             if(lastDispatchedTrain != null) {
                 countDownHandler.sendActionBarMessage(group,
@@ -135,16 +186,48 @@ public class Coaster {
         countDownHandler.startCountdown(group);
     }
 
+    /**
+     * Stops the countdown if it is running.
+     */
     public void stopCountDown() {
         countDownHandler.stopCountdown();
     }
 
+    /**
+     * Sets the number of pass-throughs for the coaster.
+     *
+     * @param passThroughs The number of pass-throughs to set.
+     */
     public void setPassThroughs(int passThroughs) {
         if (passThroughHandler == null) {
             passThroughHandler = new PassThroughHandler(this, passThroughs);
         }
     }
 
+    /**
+     * Adds a pass-through to the coaster. If the coaster has reached the maximum number of pass-throughs, it resets the count.
+     * This method also implements a cooldown to prevent rapid pass-throughs.
+     */
+    public void addPassThrough() {
+        if (passThroughHandler == null) return;
+        passThroughHandler.addPassThrough();
+    }
+
+    /**
+     * Checks if the coaster can pass through the station without triggering the station's effects.
+     *
+     * @return true if the coaster can pass through, false otherwise.
+     */
+    public boolean passThroughStation() {
+        if (passThroughHandler == null) return true;
+        return passThroughHandler.passThroughStation();
+    }
+
+    /**
+     * Adds a block to the coaster if it does not already exist.
+     *
+     * @param block The block to add.
+     */
     public void addBlock(Block block) {
         if(blocks.stream().anyMatch(block1 -> block1.getIndex() == block.getIndex())) return;
         blocks.add(block);

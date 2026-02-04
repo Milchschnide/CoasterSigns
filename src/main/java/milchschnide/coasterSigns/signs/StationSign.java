@@ -30,6 +30,9 @@ public class StationSign extends TrainCartsSignAction {
         final MinecartGroup group = event.getGroup();
         if (event.isAction(SignActionType.GROUP_ENTER)) {
             coaster.setTrainInStation(event.getMember());
+            coaster.addPassThrough();
+
+            if(coaster.passThroughStation()) return;
 
             final Station station = new Station(event);
             station.centerTrain();

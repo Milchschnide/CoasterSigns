@@ -31,19 +31,40 @@ public class Block {
         this.stationConfig = config;
     }
 
+    /**
+     * Initializes the block by adding it to the coaster's block list.
+     *
+     * @return The initialized block.
+     */
     public Block init() {
         coaster.addBlock(this);
         return this;
     }
 
+    /**
+     * Checks if there is a train currently on the block.
+     *
+     * @return true if a train is on the block, false otherwise.
+     */
     public boolean isTrainInBlock() {
         return trainOnBlock != null;
     }
 
+    /**
+     * Checks if there is a train waiting to enter the block.
+     *
+     * @return true if a train is waiting to enter, false otherwise.
+     */
     public boolean isTrainWaitingToEnter() {
         return trainWaitingToEnter != null;
     }
 
+    /**
+     * Launches the train that is waiting to enter the block.
+     * this automatically sets the previous block to free after launching.
+     *
+     * @throws IllegalStateException if no train is set to enter.
+     */
     public void launchTrain() {
         if (trainWaitingToEnter == null) throw new IllegalStateException("Train has not been set");
         trainWaitingToEnter.getActions()
@@ -53,10 +74,20 @@ public class Block {
         setPreviousBlockFree();
     }
 
+    /**
+     * Sets the previous block in the coaster to free.
+     * If the previous block has a train waiting to enter, it launches that train after a delay.
+     * If the previous block has a train on it, it clears that train after a delay and recursively checks the block before it.
+     */
     public void setPreviousBlockFree() {
         setPreviousBlockFree(this);
     }
 
+    /**
+     * Helper method to set the previous block free recursively.
+     *
+     * @param block The current block to check for the previous block.
+     */
     public void setPreviousBlockFree(Block block) {
         Block previous = coaster.getBlocks().stream()
                 .filter(b -> b.getIndex() > block.getIndex())
