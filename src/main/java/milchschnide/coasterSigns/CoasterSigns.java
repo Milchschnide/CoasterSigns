@@ -29,6 +29,8 @@ public final class CoasterSigns extends JavaPlugin {
 
     public static int defaultCountDownTime;
 
+    public static int defaultPreviousBlockLaunchDelay;
+
     public static String defaultCountDownMessagePartOne;
 
     public static String defaultCountDownMessagePartTwo;

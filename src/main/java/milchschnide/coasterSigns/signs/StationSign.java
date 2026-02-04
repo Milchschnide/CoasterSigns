@@ -8,7 +8,6 @@ import com.bergerkiller.bukkit.tc.signactions.SignActionType;
 import com.bergerkiller.bukkit.tc.signactions.TrainCartsSignAction;
 import com.bergerkiller.bukkit.tc.utils.SignBuildOptions;
 import milchschnide.coasterSigns.CoasterSigns;
-import milchschnide.coasterSigns.core.Block;
 import milchschnide.coasterSigns.core.coaster.Coaster;
 import milchschnide.coasterSigns.core.coaster.CoasterCHACHE;
 import milchschnide.coasterSigns.signs.utils.SignUtilsHandler;
@@ -41,9 +40,13 @@ public class StationSign extends TrainCartsSignAction {
             final int[] task = {0};
             task[0] = Bukkit.getScheduler().scheduleSyncRepeatingTask(CoasterSigns.instance, () -> {
                 if (group.head().getRealSpeed() == 0) {
+                    if (!group.hasPassenger()) checkPreviouseBlock(coaster, group);
+
                     coaster.openGates();
                     coaster.openRestraints(group);
+                    group.eject();
 
+                    checkPreviouseBlock(coaster, group);
                     //Task beenden
                     Bukkit.getScheduler().cancelTask(task[0]);
                 }
@@ -52,9 +55,18 @@ public class StationSign extends TrainCartsSignAction {
         } else if (event.isAction(SignActionType.GROUP_UPDATE)) {
             if (group.hasPassenger()) {
                 if (coaster.getCountDownHandler().isRunning()) return;
-                coaster.startCountDown(group,false,0);
+                coaster.startCountDown(group, false, 0);
             } else {
                 coaster.stopCountDown();
+            }
+        }
+    }
+
+    private void checkPreviouseBlock(Coaster coaster, MinecartGroup group) {
+        if (coaster.getBlocks().isEmpty()) {
+            if (coaster.getBlocks().getFirst().isTrainWaitingToEnter()) {
+                coaster.startCountDown(group, true, 0);
+                return;
             }
         }
     }
@@ -81,13 +93,18 @@ public class StationSign extends TrainCartsSignAction {
 
         final Station.StationConfig config = new Station.StationConfig();
         config.setLaunchSpeed(CoasterSigns.defaultTravelSpeed);
-        System.out.println("Default launch speed set for station set: " + CoasterSigns.defaultTravelSpeed);
 
         if (event.getLine(2).isEmpty()) {
             SignUtilsHandler.sendMessage(player, "You must specify a name for the coaster on line 3!");
             return false;
         }
         name = event.getLine(2);
+
+        final String finalName = name;
+        if (CoasterCHACHE.getCoasterCHACHE().stream().anyMatch(coaster -> coaster.name().equals(finalName))) {
+            SignUtilsHandler.sendMessage(player, "A coaster with the name '" + name + "' already exists!");
+            return false;
+        }
 
         if (!event.getLine(3).isEmpty()) {
             final String[] line4 = event.getLine(3).split(",");

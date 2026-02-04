@@ -52,6 +52,7 @@ public final class ConfigHandler {
         conf.addDefault("defaults.station.countDown.messagePartTwo", "second/s");
         conf.addDefault("defaults.station.announcement.message", "Have a nice ride!");
         conf.addDefault("defaults.station.announcement.nextBlockIsOccupied", "§cCountdown cancelled! §7Next block is still occupied.");
+        conf.addDefault("defaults.block.previousBlockLaunchDelay", 1);
         conf.options().copyDefaults(true);
         try {
             conf.save(configPath);
@@ -77,6 +78,8 @@ public final class ConfigHandler {
         CoasterSigns.defaultCountDownMessagePartTwo = configuration.getString("defaults.station.countDown.messagePartTwo");
         CoasterSigns.defaultAnnouncementMessage = configuration.getString("defaults.station.announcement.message");
         CoasterSigns.defaultNextBlockIsOccupiedMessage = configuration.getString("defaults.station.announcement.nextBlockIsOccupied");
+        CoasterSigns.defaultPreviousBlockLaunchDelay = configuration.getInt("defaults.block.previousBlockLaunchDelay") * 20;
+
     }
 
 }

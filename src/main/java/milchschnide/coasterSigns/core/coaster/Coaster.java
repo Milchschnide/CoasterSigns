@@ -42,6 +42,7 @@ public class Coaster {
     }
 
     public Coaster init() {
+        System.out.println("Initialized coaster " + name());
         CoasterCHACHE.addCoaster(this);
         return this;
     }
@@ -85,7 +86,9 @@ public class Coaster {
         trainInStation.getActions()
                 .addActionLaunch(direction, stationConfig.getLaunchConfig(), stationConfig.getLaunchSpeed());
         setWaitingOnNextBlock(trainInStation);
-        clearPreviousBlocks();
+        Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance,
+                this::clearPreviousBlocks, CoasterSigns.defaultPreviousBlockLaunchDelay);
+        trainInStation = null;
     }
 
     /**
@@ -126,8 +129,9 @@ public class Coaster {
                 return;
             }
         }
+        if (!isTrainInStation()) return;
         if(forceStart) {
-            countDownHandler.closeGatesAndRestraints(group);
+            countDownHandler.closeGatesAndRestraints(trainInStation.getGroup());
             return;
         }
         countDownHandler.startCountdown(group);
@@ -145,6 +149,7 @@ public class Coaster {
 
     public void addBlock(Block block) {
         blocks.add(block);
+        System.out.println("Added block with index " + block.getIndex() + " to coaster " + name());
         blocks.sort(Comparator.comparingInt(Block::getIndex));
     }
 
