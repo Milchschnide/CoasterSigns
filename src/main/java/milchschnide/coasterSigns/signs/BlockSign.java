@@ -1,6 +1,7 @@
 package milchschnide.coasterSigns.signs;
 
 import com.bergerkiller.bukkit.tc.Station;
+import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
 import com.bergerkiller.bukkit.tc.events.SignActionEvent;
 import com.bergerkiller.bukkit.tc.events.SignChangeActionEvent;
 import com.bergerkiller.bukkit.tc.signactions.SignAction;
@@ -41,11 +42,14 @@ public class BlockSign extends SignAction {
                 return;
             }
 
+            final MinecartGroup group = event.getGroup();
+
             final Station station = new Station(event);
             block.setDirection(station.getNextDirectionFace());
 
             if (block.isTrainInBlock()) {
                 block.setTrainWaitingToEnter(event.getMember());
+                group.getActions().launchReset();
                 station.centerTrain();
             } else {
                 block.setTrainOnBlock(event.getMember());
@@ -53,7 +57,7 @@ public class BlockSign extends SignAction {
                 block.setPreviousBlockFree();
             }
 
-            if (event.getGroup().hasPassenger()) coaster.startCountDown(event.getGroup(),true,0);
+            if (group.hasPassenger() && coaster.isTrainInStation()) coaster.startCountDown(group, true, 0);
         }
     }
 
@@ -92,8 +96,11 @@ public class BlockSign extends SignAction {
             SignUtilsHandler.sendMessage(player, " Coaster with name '" + coasterName + "' does not exist!");
             return false;
         }
+
         final Coaster coaster = CoasterCHACHE.getCoasterCHACHE().stream()
                 .filter(coaster1 -> coaster1.name().equals(coasterName)).findFirst().orElseThrow();
+
+        System.out.println("Creating block for coaster: " + coaster.name() + " with index: " + line2[1]);
 
         int index;
         try {

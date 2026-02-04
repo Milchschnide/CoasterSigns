@@ -4,7 +4,9 @@ import com.bergerkiller.bukkit.tc.Station;
 import com.bergerkiller.bukkit.tc.controller.MinecartMember;
 import lombok.Getter;
 import lombok.Setter;
+import milchschnide.coasterSigns.CoasterSigns;
 import milchschnide.coasterSigns.core.coaster.Coaster;
+import org.bukkit.Bukkit;
 import org.bukkit.block.BlockFace;
 
 import java.util.Comparator;
@@ -62,10 +64,12 @@ public class Block {
                 .orElse(null);
         if (previous == null) return;
         if (previous.isTrainWaitingToEnter()) {
-            previous.launchTrain();
+            Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance,
+                    previous::launchTrain, CoasterSigns.defaultPreviousBlockLaunchDelay);
         } else {
             previous.setTrainOnBlock(null);
-            setPreviousBlockFree(previous);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance, () ->
+                    setPreviousBlockFree(previous), CoasterSigns.defaultPreviousBlockLaunchDelay);
         }
     }
 
