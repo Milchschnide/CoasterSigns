@@ -57,6 +57,7 @@ public class Coaster {
      * @return The initialized coaster.
      */
     public Coaster init() {
+        System.out.println("Initializing coaster " + name);
         CoasterCACHE.addCoaster(this);
         return this;
     }
@@ -151,7 +152,8 @@ public class Coaster {
      * or setting the previous block free if a train is on it.
      */
     private void clearPreviousBlocks() {
-        final Block previousBlock = blocks.getFirst();
+        Block previousBlock = null;
+        if (!blocks.isEmpty()) previousBlock = blocks.getFirst();
         if (previousBlock == null) return;
         if (previousBlock.isTrainWaitingToEnter()) {
             previousBlock.launchTrain();
