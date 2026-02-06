@@ -114,7 +114,7 @@ public class Coaster {
         properties.setPlayersEnter(false);
         properties.setPlayersExit(false);
 
-        group.playNamedAnimation("open_restraints");
+        group.playNamedAnimation("open");
     }
 
     /**
@@ -127,7 +127,7 @@ public class Coaster {
         properties.setPlayersEnter(false);
         properties.setPlayersExit(false);
 
-        group.playNamedAnimation("close_restraints");
+        group.playNamedAnimation("close");
     }
 
     /**
