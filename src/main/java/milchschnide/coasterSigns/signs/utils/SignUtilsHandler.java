@@ -117,6 +117,8 @@ public class SignUtilsHandler {
         if (player != null) {
             player.sendMessage(Component.text("[CoasterSigns]: ", Color.CYAN.color)
                     .append(Component.text(message, TextColor.color(255, 255, 255))));
+        } else {
+            System.out.println(message);
         }
 
     }

@@ -4,8 +4,8 @@ import com.bergerkiller.bukkit.tc.Station;
 import com.bergerkiller.bukkit.tc.controller.MinecartGroup;
 import com.bergerkiller.bukkit.tc.events.SignActionEvent;
 import com.bergerkiller.bukkit.tc.events.SignChangeActionEvent;
+import com.bergerkiller.bukkit.tc.signactions.SignAction;
 import com.bergerkiller.bukkit.tc.signactions.SignActionType;
-import com.bergerkiller.bukkit.tc.signactions.TrainCartsSignAction;
 import com.bergerkiller.bukkit.tc.utils.SignBuildOptions;
 import milchschnide.coasterSigns.CoasterSigns;
 import milchschnide.coasterSigns.core.coaster.Coaster;
@@ -15,10 +15,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
-public class StationSign extends TrainCartsSignAction {
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
-    public StationSign() {
-        super("coaster");
+public class StationSign extends SignAction {
+
+    @Override
+    public boolean match(SignActionEvent event) {
+        return event.isType("coaster");
     }
 
     @Override
@@ -29,7 +33,6 @@ public class StationSign extends TrainCartsSignAction {
         if (coaster == null) throw new RuntimeException("Big stress, pls report!");
 
         final MinecartGroup group = event.getGroup();
-        group.getActions().launchReset();
         if (event.isAction(SignActionType.GROUP_ENTER)) {
             // Set the train in station to prevent other trains from entering the station
             coaster.setTrainInStation(event.getMember());
@@ -65,7 +68,7 @@ public class StationSign extends TrainCartsSignAction {
                     //Task beenden
                     Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance, () -> {
                         coaster.setCooldown(false);
-                    },5);
+                    }, 5);
                     Bukkit.getScheduler().cancelTask(task[0]);
                 }
             }, 0, 5);
@@ -178,6 +181,7 @@ public class StationSign extends TrainCartsSignAction {
             if (line5.length > 0 && !line5[0].isEmpty()) {
                 if (line5.length == 1) {
                     try {
+                        System.out.println(line5[0].toUpperCase());
                         direction = BlockFace.valueOf(line5[0].toUpperCase());
                     } catch (IllegalArgumentException e) {
                         SignUtilsHandler.sendMessage(player, "Invalid direction on line 5! " +
@@ -247,7 +251,7 @@ public class StationSign extends TrainCartsSignAction {
                 }
                 if (enableSlowdownWhenEnter == 1) coaster.setSlowdownWhenEnter(true);
                 if (enableSlowdownWhenExit == 1) coaster.setSlowdownWhenExit(true);
-            } else {
+            } else if (line7.length > 2) {
                 SignUtilsHandler.sendMessage(player, "Invalid parameters on line 7! Expected format: " +
                         "EnalbeSlowdownWhenEnter or EnableSlowdownWhenEnter,EnableSlowdownWhenExit");
                 return false;
