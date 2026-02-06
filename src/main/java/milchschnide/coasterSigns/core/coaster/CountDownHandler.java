@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 public class CountDownHandler {
     private final Coaster coaster;
     private boolean isCountingDown = false;
+    private boolean isForcedToStop = false;
     private int countdownTime;
 
     public CountDownHandler(Coaster coaster) {
@@ -34,7 +35,7 @@ public class CountDownHandler {
     /**
      * Waits until the next block is free before starting the countdown. If the block does not free up within a certain time, it will stop waiting and open the gates and restraints.
      *
-     * @param group The minecart group for which to wait.
+     * @param group         The minecart group for which to wait.
      * @param maxTimeToWait The maximum time to wait in seconds.
      */
     private void waitTillNextBlockIsFree(MinecartGroup group, int maxTimeToWait) {
@@ -66,7 +67,7 @@ public class CountDownHandler {
     private void countdownTick(MinecartGroup group) {
         countdownTime--;
         sendActionBarMessage(group, getCountdownMessage(countdownTime));
-        if (!isCountingDown) return;
+        if (!isCountingDown || isForcedToStop) return;
         if (countdownTime <= 0) {
             closeGatesAndRestraints(group);
             return;
@@ -76,16 +77,15 @@ public class CountDownHandler {
 
     // Generates the countdown message to be sent to the passengers, including the time left and the appropriate singular/plural form of "second".
     private Component getCountdownMessage(int timeLeft) {
-        return Component.text(CoasterSigns.defaultCountDownMessagePartOne + timeLeft
-                + (timeLeft < 2
-                ? CoasterSigns.defaultCountDownMessagePartTwo.split("/")[0]
-                : CoasterSigns.defaultCountDownMessagePartTwo));
+        final String[] text = CoasterSigns.defaultCountDownMessagePartTwo.split("/");
+        return Component.text(CoasterSigns.defaultCountDownMessagePartOne + " " + timeLeft + " "
+                + (timeLeft < 2 ? text[0] : text[0] + text[1]));
     }
 
     /**
      * Sends an action bar message to all passengers of the minecart group.
      *
-     * @param group The minecart group to which the message should be sent.
+     * @param group     The minecart group to which the message should be sent.
      * @param component The message component to send.
      */
     public void sendActionBarMessage(MinecartGroup group, Component component) {
@@ -104,6 +104,8 @@ public class CountDownHandler {
     public void closeGatesAndRestraints(MinecartGroup group) {
         coaster.closeGates();
         coaster.closeRestraints(group);
+
+        isForcedToStop = true;
 
         sendActionBarMessage(group, Component.text(CoasterSigns.defaultAnnouncementMessage));
 
@@ -125,6 +127,7 @@ public class CountDownHandler {
      */
     public void stopCountdown() {
         isCountingDown = false;
+        isForcedToStop = false;
     }
 
     /**

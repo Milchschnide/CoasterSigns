@@ -51,7 +51,7 @@ public final class ConfigHandler {
         conf.addDefault("defaults.station.countDown.messagePartOne", "The train will depart in");
         conf.addDefault("defaults.station.countDown.messagePartTwo", "second/s");
         conf.addDefault("defaults.station.announcement.message", "Have a nice ride!");
-        conf.addDefault("defaults.station.announcement.nextBlockIsOccupied", "§cCountdown cancelled! §7Next block is still occupied.");
+        conf.addDefault("defaults.station.announcement.nextBlockIsOccupied", "Next block is still occupied.");
         conf.addDefault("defaults.block.previousBlockLaunchDelay", 1);
         conf.options().copyDefaults(true);
         try {

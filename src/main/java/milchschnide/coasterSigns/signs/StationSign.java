@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.tc.signactions.TrainCartsSignAction;
 import com.bergerkiller.bukkit.tc.utils.SignBuildOptions;
 import milchschnide.coasterSigns.CoasterSigns;
 import milchschnide.coasterSigns.core.coaster.Coaster;
-import milchschnide.coasterSigns.core.coaster.CoasterCHACHE;
+import milchschnide.coasterSigns.core.coaster.CoasterCACHE;
 import milchschnide.coasterSigns.signs.utils.SignUtilsHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.block.BlockFace;
@@ -24,7 +24,7 @@ public class StationSign extends TrainCartsSignAction {
     @Override
     public void execute(SignActionEvent event) {
         //Error handling if coaster does not exist, should never happen
-        final Coaster coaster = CoasterCHACHE.getCoasterCHACHE().stream().filter(coaster1 ->
+        final Coaster coaster = CoasterCACHE.getCoasterCACHE().stream().filter(coaster1 ->
                 coaster1.name().equals(event.getLine(2))).findFirst().orElse(null);
         if (coaster == null) throw new RuntimeException("Big stress, pls report!");
 
@@ -105,8 +105,7 @@ public class StationSign extends TrainCartsSignAction {
 
     @Override
     public void destroy(SignActionEvent event) {
-        System.out.println("Station sign for coaster " + event.getLine(2) + " was destroyed!");
-        final Coaster coaster = CoasterCHACHE.getCoasterCHACHE().stream().filter(coaster1 ->
+        final Coaster coaster = CoasterCACHE.getCoasterCACHE().stream().filter(coaster1 ->
                 coaster1.name().equals(event.getLine(2))).findFirst().orElse(null);
         if (coaster == null) {
             SignUtilsHandler.sendMessage(null, "A coaster with the name '"
@@ -148,7 +147,7 @@ public class StationSign extends TrainCartsSignAction {
         name = event.getLine(2);
 
         final String finalName = name;
-        if (CoasterCHACHE.getCoasterCHACHE().stream().anyMatch(coaster -> coaster.name().equals(finalName))) {
+        if (CoasterCACHE.getCoasterCACHE().stream().anyMatch(coaster -> coaster.name().equals(finalName))) {
             SignUtilsHandler.sendMessage(player, "A coaster with the name '" + name + "' already exists!");
             return false;
         }

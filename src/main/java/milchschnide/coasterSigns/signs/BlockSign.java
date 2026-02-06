@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.tc.utils.SignBuildOptions;
 import milchschnide.coasterSigns.CoasterSigns;
 import milchschnide.coasterSigns.core.block.Block;
 import milchschnide.coasterSigns.core.coaster.Coaster;
-import milchschnide.coasterSigns.core.coaster.CoasterCHACHE;
+import milchschnide.coasterSigns.core.coaster.CoasterCACHE;
 import milchschnide.coasterSigns.signs.utils.SignUtilsHandler;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -33,7 +33,7 @@ public class BlockSign extends SignAction {
     public void execute(SignActionEvent event) {
         if (event.isAction(SignActionType.GROUP_ENTER)) {
             final String[] line2 = event.getLine(1).split(",");
-            final Coaster coaster = CoasterCHACHE.getCoasterCHACHE().stream().filter(coaster1 ->
+            final Coaster coaster = CoasterCACHE.getCoasterCACHE().stream().filter(coaster1 ->
                     coaster1.name().equals(line2[0])).findFirst().orElse(null);
             //Error handling if coaster or block does not exist, should never happen
             if (coaster == null) {
@@ -104,7 +104,7 @@ public class BlockSign extends SignAction {
      * @return true if the sign is a block sign, false otherwise.
      */
     public boolean isblockSign(SignActionEvent event) {
-        return CoasterCHACHE.getCoasterCHACHE().stream().anyMatch(coaster -> event.isType(coaster.name()));
+        return CoasterCACHE.getCoasterCACHE().stream().anyMatch(coaster -> event.isType(coaster.name()));
     }
 
     /**
@@ -131,12 +131,12 @@ public class BlockSign extends SignAction {
 
         final String coasterName = line2[0];
 
-        if (CoasterCHACHE.getCoasterCHACHE().stream().noneMatch(coaster -> coaster.name().equals(coasterName))) {
+        if (CoasterCACHE.getCoasterCACHE().stream().noneMatch(coaster -> coaster.name().equals(coasterName))) {
             SignUtilsHandler.sendMessage(player, " Coaster with name '" + coasterName + "' does not exist!");
             return false;
         }
 
-        final Coaster coaster = CoasterCHACHE.getCoasterCHACHE().stream()
+        final Coaster coaster = CoasterCACHE.getCoasterCACHE().stream()
                 .filter(coaster1 -> coaster1.name().equals(coasterName)).findFirst().orElseThrow();
 
         int index;

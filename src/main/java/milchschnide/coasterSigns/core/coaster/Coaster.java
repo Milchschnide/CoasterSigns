@@ -57,7 +57,7 @@ public class Coaster {
      * @return The initialized coaster.
      */
     public Coaster init() {
-        CoasterCHACHE.addCoaster(this);
+        CoasterCACHE.addCoaster(this);
         return this;
     }
 
@@ -66,7 +66,7 @@ public class Coaster {
      */
     public void deleteCoaster() {
         blocks.clear();
-        CoasterCHACHE.removeCoaster(this);
+        CoasterCACHE.removeCoaster(this);
     }
 
     /**
@@ -136,7 +136,7 @@ public class Coaster {
      * @throws IllegalStateException if no train is set in the station.
      */
     public void launchTrain() {
-        if (trainInStation == null) throw new IllegalStateException("Train has not been set");
+        if (trainInStation == null) return;
         trainInStation.getActions()
                 .addActionLaunch(direction, stationConfig.getLaunchConfig(), stationConfig.getLaunchSpeed());
         if(!block.isEmpty()) lastDispatchedTrain = trainInStation;
@@ -181,16 +181,14 @@ public class Coaster {
             }
             Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance, () -> {
                 startCountDown(group, forceStart, finalI);
-            });
+            },20);
             return;
         }
         if (!isTrainInStation()) return;
         if (forceStart) {
             countDownHandler.closeGatesAndRestraints(trainInStation.getGroup());
-            System.out.println("Force start count down");
             return;
         }
-        System.out.println("Start Countdown");
         countDownHandler.startCountdown(group);
     }
 
