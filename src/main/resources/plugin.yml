@@ -1,5 +1,5 @@
 name: CoasterSigns
-version: '0.2.6'
+version: '0.2.7'
 main: milchschnide.coasterSigns.CoasterSigns
 api-version: '1.21'
 
