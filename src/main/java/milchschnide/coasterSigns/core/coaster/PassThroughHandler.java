@@ -4,14 +4,13 @@ import milchschnide.coasterSigns.CoasterSigns;
 import org.bukkit.Bukkit;
 
 public class PassThroughHandler {
-    private final Coaster coaster;
     private final int passThroughs;
-    private int currentPassThroughs = 0;
+    private int currentPassThroughs;
     private boolean isCooledDown = true;
 
-    public PassThroughHandler(Coaster coaster, int passThroughs) {
-        this.coaster = coaster;
+    public PassThroughHandler(int passThroughs) {
         this.passThroughs = passThroughs;
+        currentPassThroughs = passThroughs;
     }
 
     /**

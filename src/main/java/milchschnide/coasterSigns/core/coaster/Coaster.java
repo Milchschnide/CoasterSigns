@@ -37,6 +37,13 @@ public class Coaster {
     @Setter
     private org.bukkit.block.Block block;
     private boolean restraintsClosed = false;
+    @Setter
+    private boolean slowdownWhenEnter = false;
+    @Setter
+    private boolean slowdownWhenExit = false;
+    @Getter
+    @Setter
+    private boolean cooldown = false;
 
     public Coaster(String name, StationConfig stationConfig, BlockFace direction) {
         this.name = name;
@@ -132,9 +139,10 @@ public class Coaster {
         if (trainInStation == null) throw new IllegalStateException("Train has not been set");
         trainInStation.getActions()
                 .addActionLaunch(direction, stationConfig.getLaunchConfig(), stationConfig.getLaunchSpeed());
-        lastDispatchedTrain = trainInStation;
+        if(!block.isEmpty()) lastDispatchedTrain = trainInStation;
         Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance,
                 this::clearPreviousBlocks, CoasterSigns.defaultPreviousBlockLaunchDelay);
+        trainInStation.getGroup().getProperties().setSlowingDown(slowdownWhenExit);
         trainInStation = null;
     }
 
@@ -145,7 +153,7 @@ public class Coaster {
     private void clearPreviousBlocks() {
         final Block previousBlock = blocks.getFirst();
         if (previousBlock == null) return;
-        if (previousBlock.isTrainWaitingToEnter()){
+        if (previousBlock.isTrainWaitingToEnter()) {
             previousBlock.launchTrain();
         } else {
             previousBlock.setPreviousBlockFree();
@@ -161,23 +169,23 @@ public class Coaster {
      * @param i          The current iteration count for checking block occupancy.
      */
     public void startCountDown(MinecartGroup group, boolean forceStart, int i) {
-            if(lastDispatchedTrain != null) {
-                countDownHandler.sendActionBarMessage(group,
-                        Component.text(CoasterSigns.defaultNextBlockIsOccupiedMessage));
-                if(!forceStart) return;
-                final int finalI = i++;
-                if(finalI > 180) {
-                    System.out.println("Countdown stopped for coaster " + name() +
-                            " because the next block did not free up in time.");
-                    return;
-                }
-                Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance,() -> {
-                    startCountDown(group, forceStart, finalI);
-                });
+        if (lastDispatchedTrain != null) {
+            countDownHandler.sendActionBarMessage(group,
+                    Component.text(CoasterSigns.defaultNextBlockIsOccupiedMessage));
+            if (!forceStart) return;
+            final int finalI = i++;
+            if (finalI > 180) {
+                System.out.println("Countdown stopped for coaster " + name() +
+                        " because the next block did not free up in time.");
                 return;
             }
+            Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance, () -> {
+                startCountDown(group, forceStart, finalI);
+            });
+            return;
+        }
         if (!isTrainInStation()) return;
-        if(forceStart) {
+        if (forceStart) {
             countDownHandler.closeGatesAndRestraints(trainInStation.getGroup());
             System.out.println("Force start count down");
             return;
@@ -200,7 +208,7 @@ public class Coaster {
      */
     public void setPassThroughs(int passThroughs) {
         if (passThroughHandler == null) {
-            passThroughHandler = new PassThroughHandler(this, passThroughs);
+            passThroughHandler = new PassThroughHandler(passThroughs);
         }
     }
 
@@ -219,7 +227,7 @@ public class Coaster {
      * @return true if the coaster can pass through, false otherwise.
      */
     public boolean passThroughStation() {
-        if (passThroughHandler == null) return true;
+        if (passThroughHandler == null) return false;
         return passThroughHandler.passThroughStation();
     }
 
@@ -229,9 +237,16 @@ public class Coaster {
      * @param block The block to add.
      */
     public void addBlock(Block block) {
-        if(blocks.stream().anyMatch(block1 -> block1.getIndex() == block.getIndex())) return;
+        if (blocks.stream().anyMatch(block1 -> block1.getIndex() == block.getIndex())) return;
         blocks.add(block);
         blocks.sort(Comparator.comparingInt(Block::getIndex));
+    }
+
+    /**
+     * @return true if slowdown should be activated when a train exits the station, false otherwise.
+     */
+    public boolean slowdownWhenEnter() {
+        return slowdownWhenEnter;
     }
 
 }

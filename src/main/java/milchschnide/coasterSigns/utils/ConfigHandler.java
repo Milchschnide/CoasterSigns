@@ -79,7 +79,6 @@ public final class ConfigHandler {
         CoasterSigns.defaultAnnouncementMessage = configuration.getString("defaults.station.announcement.message");
         CoasterSigns.defaultNextBlockIsOccupiedMessage = configuration.getString("defaults.station.announcement.nextBlockIsOccupied");
         CoasterSigns.defaultPreviousBlockLaunchDelay = configuration.getInt("defaults.block.previousBlockLaunchDelay") * 20;
-
     }
 
 }

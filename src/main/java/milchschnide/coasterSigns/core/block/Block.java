@@ -25,6 +25,10 @@ public class Block {
     @Setter
     private BlockFace direction;
 
+    @Setter
+    @Getter
+    private boolean hasSlowdownBeenEnabled = false;
+
     public Block(Coaster coaster, int index, Station.StationConfig config) {
         this.coaster = coaster;
         this.index = index;
@@ -70,6 +74,7 @@ public class Block {
         trainWaitingToEnter.getActions()
                 .addActionLaunch(direction, stationConfig.getLaunchConfig(), stationConfig.getLaunchSpeed());
         trainOnBlock = trainWaitingToEnter;
+        if(hasSlowdownBeenEnabled) trainOnBlock.getGroup().getProperties().setSlowingDown(true);
         trainWaitingToEnter = null;
         setPreviousBlockFree();
     }
