@@ -140,7 +140,7 @@ public class Coaster {
         if (trainInStation == null) return;
         trainInStation.getActions()
                 .addActionLaunch(direction, stationConfig.getLaunchConfig(), stationConfig.getLaunchSpeed());
-        if(!block.isEmpty()) lastDispatchedTrain = trainInStation;
+        if(!blocks.isEmpty()) lastDispatchedTrain = trainInStation;
         Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance,
                 this::clearPreviousBlocks, CoasterSigns.defaultPreviousBlockLaunchDelay);
         trainInStation.getGroup().getProperties().setSlowingDown(slowdownWhenExit);
