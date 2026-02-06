@@ -6,7 +6,7 @@
 
     <groupId>milchschnide</groupId>
     <artifactId>CoasterSigns</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1</version>
     <packaging>jar</packaging>
 
     <name>CoasterSigns</name>
@@ -77,6 +77,12 @@
         <dependency>
             <groupId>com.bergerkiller.bukkit</groupId>
             <artifactId>TrainCarts</artifactId>
+            <version>LATEST</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.bergerkiller.bukkit</groupId>
+            <artifactId>TCCoasters</artifactId>
             <version>LATEST</version>
             <scope>provided</scope>
         </dependency>

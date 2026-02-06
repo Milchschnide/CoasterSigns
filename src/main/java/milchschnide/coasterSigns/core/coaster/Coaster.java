@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Coaster {
+    @Getter
     private final String name;
     @Getter
     private final List<Block> blocks = new ArrayList<>();
