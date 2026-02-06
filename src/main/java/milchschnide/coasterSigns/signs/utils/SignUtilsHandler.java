@@ -1,16 +1,24 @@
 package milchschnide.coasterSigns.signs.utils;
 
 import com.bergerkiller.bukkit.tc.Station;
-import com.bergerkiller.bukkit.tc.events.SignActionEvent;
 import milchschnide.coasterSigns.utils.Color;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.entity.Player;
-import java.util.regex.Pattern;
+
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SignUtilsHandler {
 
+    /**
+     * Validates the launch parameters provided in the sign.
+     * It checks if the first parameter is a valid number and if the second parameter is in the correct format for acceleration or distance.
+     *
+     * @param args   The array of arguments from the sign.
+     * @param player The player to send error messages to if validation fails.
+     * @return true if the parameters are valid, false otherwise.
+     */
     public static boolean validateLaunch(String[] args, Player player) {
         try {
             Double.parseDouble(args[0]);
@@ -42,7 +50,7 @@ public class SignUtilsHandler {
             unitPart = unitPart.trim();
             if (!unitPart.isEmpty() && !unitPart.equalsIgnoreCase("g") &&
                     !unitPart.equalsIgnoreCase("m/s^2")) {
-                sendMessage(player," Invalid unit for acceleration/distance! Use 'g' , 'm/s^2' or 'm'.");
+                sendMessage(player, " Invalid unit for acceleration/distance! Use 'g' , 'm/s^2' or 'm'.");
                 return false;
             }
         } catch (NumberFormatException e) {
@@ -52,6 +60,14 @@ public class SignUtilsHandler {
         return true;
     }
 
+    /**
+     * Checks the possible launch parameters from the sign and sets the corresponding values in the station configuration.
+     * It handles different formats for acceleration and distance, and sends error messages to the player if any validation fails.
+     *
+     * @param player The player to send error messages to if validation fails.
+     * @param config The station configuration to set the launch parameters on.
+     * @param line   The array of launch parameters from the sign.
+     */
     public static void checkPosibleLaunch(Player player, Station.StationConfig config, String[] line) {
         if (!line[0].isEmpty()) {
             if (line.length == 1) {
@@ -90,9 +106,15 @@ public class SignUtilsHandler {
         }
     }
 
+    /**
+     * Sends a formatted message to the player with a prefix and the specified message content.
+     *
+     * @param player  The player to send the message to.
+     * @param message The content of the message to send.
+     */
     public static void sendMessage(Player player, String message) {
         if (player != null) {
-            player.sendMessage(Component.text("[CoasterSigns]: ",Color.CYAN.color)
+            player.sendMessage(Component.text("[CoasterSigns]: ", Color.CYAN.color)
                     .append(Component.text(message, TextColor.color(255, 255, 255))));
         }
 

@@ -15,6 +15,12 @@ public class CountDownHandler {
         this.coaster = coaster;
     }
 
+    /**
+     * Starts the countdown for the given minecart group.
+     * If there is a train currently on the next block, it will wait until the block is free before starting the countdown.
+     *
+     * @param group The minecart group for which to start the countdown.
+     */
     public void startCountdown(MinecartGroup group) {
         isCountingDown = true;
         countdownTime = CoasterSigns.defaultCountDownTime + 1;
@@ -25,6 +31,12 @@ public class CountDownHandler {
         countdownTick(group);
     }
 
+    /**
+     * Waits until the next block is free before starting the countdown. If the block does not free up within a certain time, it will stop waiting and open the gates and restraints.
+     *
+     * @param group The minecart group for which to wait.
+     * @param maxTimeToWait The maximum time to wait in seconds.
+     */
     private void waitTillNextBlockIsFree(MinecartGroup group, int maxTimeToWait) {
         int finalMaxTimeToWait = maxTimeToWait++;
         if (finalMaxTimeToWait >= 180) {
@@ -45,6 +57,12 @@ public class CountDownHandler {
         }, 20L);
     }
 
+    /**
+     * Handles each tick of the countdown,
+     * sending action bar messages to the passengers and checking if the countdown has reached zero to close gates and restraints.
+     *
+     * @param group The minecart group for which to handle the countdown tick.
+     */
     private void countdownTick(MinecartGroup group) {
         countdownTime--;
         sendActionBarMessage(group, getCountdownMessage(countdownTime));
@@ -56,6 +74,7 @@ public class CountDownHandler {
         Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance, () -> countdownTick(group), 20L);
     }
 
+    // Generates the countdown message to be sent to the passengers, including the time left and the appropriate singular/plural form of "second".
     private Component getCountdownMessage(int timeLeft) {
         return Component.text(CoasterSigns.defaultCountDownMessagePartOne + timeLeft
                 + (timeLeft < 2
@@ -63,6 +82,12 @@ public class CountDownHandler {
                 : CoasterSigns.defaultCountDownMessagePartTwo));
     }
 
+    /**
+     * Sends an action bar message to all passengers of the minecart group.
+     *
+     * @param group The minecart group to which the message should be sent.
+     * @param component The message component to send.
+     */
     public void sendActionBarMessage(MinecartGroup group, Component component) {
         group.forEach((minecartMember) -> minecartMember.getEntity().getPassengers()
                 .forEach(passenger -> {
@@ -71,6 +96,11 @@ public class CountDownHandler {
                 }));
     }
 
+    /**
+     * Closes the gates and restraints for the given minecart group, sends an announcement message, and schedules the train to launch after a short delay.
+     *
+     * @param group The minecart group for which to close gates and restraints.
+     */
     public void closeGatesAndRestraints(MinecartGroup group) {
         coaster.closeGates();
         coaster.closeRestraints(group);
@@ -80,15 +110,28 @@ public class CountDownHandler {
         Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance, this::launchTrain, 60L);
     }
 
+    /**
+     * Launches the train currently in the station and schedules the countdown to stop after a short delay.
+     *
+     * @throws IllegalStateException if no train is set in the station.
+     */
     private void launchTrain() {
         coaster.launchTrain();
         Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance, this::stopCountdown, 20L);
     }
 
+    /**
+     * Stops the countdown, allowing gates and restraints to be opened again and preventing any further countdown ticks or waiting for the next block to free up.
+     */
     public void stopCountdown() {
         isCountingDown = false;
     }
 
+    /**
+     * Checks if the countdown is currently running.
+     *
+     * @return true if the countdown is running, false otherwise.
+     */
     public boolean isRunning() {
         return isCountingDown;
     }

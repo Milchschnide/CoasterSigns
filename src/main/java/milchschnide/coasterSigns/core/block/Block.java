@@ -24,6 +24,9 @@ public class Block {
     private MinecartMember<?> trainWaitingToEnter = null;
     @Setter
     private BlockFace direction;
+    @Setter
+    @Getter
+    private boolean hasSlowdownBeenEnabled = false;
 
     public Block(Coaster coaster, int index, Station.StationConfig config) {
         this.coaster = coaster;
@@ -70,6 +73,7 @@ public class Block {
         trainWaitingToEnter.getActions()
                 .addActionLaunch(direction, stationConfig.getLaunchConfig(), stationConfig.getLaunchSpeed());
         trainOnBlock = trainWaitingToEnter;
+        if(hasSlowdownBeenEnabled) trainOnBlock.getGroup().getProperties().setSlowingDown(true);
         trainWaitingToEnter = null;
         setPreviousBlockFree();
     }
