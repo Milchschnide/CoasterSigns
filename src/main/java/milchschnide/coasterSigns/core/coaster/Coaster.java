@@ -111,8 +111,8 @@ public class Coaster {
      */
     public void openRestraints(MinecartGroup group) {
         final TrainProperties properties = group.getProperties();
-        properties.setPlayersEnter(false);
-        properties.setPlayersExit(false);
+        properties.setPlayersEnter(true);
+        properties.setPlayersExit(true);
 
         group.playNamedAnimation("open");
     }
