@@ -9,6 +9,7 @@ import com.bergerkiller.bukkit.tc.signactions.SignAction;
 import com.bergerkiller.bukkit.tc.signactions.SignActionType;
 import com.bergerkiller.bukkit.tc.utils.SignBuildOptions;
 import milchschnide.coasterSigns.CoasterSigns;
+import milchschnide.coasterSigns.signs.utils.SignUtilsHandler;
 import org.bukkit.Bukkit;
 
 public class HoldAndLaunchSign extends SignAction {
@@ -102,7 +103,7 @@ public class HoldAndLaunchSign extends SignAction {
         if (!event.getLine(3).isEmpty()) {
             final String[] line4 = event.getLine(3).split(",");
             if (line4.length == 2) {
-                if (!validateLaunchParameters(event, line4)) return false;
+                if (!SignUtilsHandler.validateLaunch(line4,event.getPlayer())) return false;
             } else if (line4.length == 1) {
                 try {
                     Double.parseDouble(line4[0]);
@@ -119,49 +120,5 @@ public class HoldAndLaunchSign extends SignAction {
                 .setName("HoldAndLaunch")
                 .setDescription("Holds the train for a specified time and then launches it")
                 .handle(event);
-    }
-
-    private static boolean validateLaunchParameters(SignChangeActionEvent event, String[] line4) {
-        try {
-            Double.parseDouble(line4[0]);
-            final String p = line4[1].trim();
-            String numberPart = null;
-            String unitPart = "";
-
-            final java.util.regex.Pattern pNumUnit =
-                    java.util.regex.Pattern.compile("^([+-]?\\d*\\.?\\d+)\\s*(m/s\\^2|g|m)?$"
-                            , java.util.regex.Pattern.CASE_INSENSITIVE);
-            final java.util.regex.Pattern pUnitNum =
-                    java.util.regex.Pattern.compile("^(m/s\\^2|g|m)\\s*([+-]?\\d*\\.?\\d+)$"
-                            , java.util.regex.Pattern.CASE_INSENSITIVE);
-            java.util.regex.Matcher m = pNumUnit.matcher(p);
-
-            if (m.matches()) {
-                numberPart = m.group(1);
-                unitPart = m.group(2) == null ? "" : m.group(2);
-            } else {
-                m = pUnitNum.matcher(p);
-                if (m.matches()) {
-                    unitPart = m.group(1);
-                    numberPart = m.group(2);
-                } else {
-                    event.getPlayer().sendMessage("§b[CoasterSigns]§r Invalid launch parameter format!");
-                    return false;
-                }
-            }
-
-            Double.parseDouble(numberPart);
-            unitPart = unitPart.trim();
-            if (!unitPart.isEmpty() && !unitPart.equalsIgnoreCase("g") &&
-                    !unitPart.equalsIgnoreCase("m/s^2")) {
-                event.getPlayer().sendMessage("§b[CoasterSigns]§r Invalid unit for acceleration/distance! " +
-                        "Use 'g' , 'm/s^2' or 'm'.");
-                return false;
-            }
-        } catch (NumberFormatException e) {
-            event.getPlayer().sendMessage("§b[CoasterSigns]§r Invalid launch speed or distance/acceleration value!");
-            return false;
-        }
-        return true;
     }
 }
