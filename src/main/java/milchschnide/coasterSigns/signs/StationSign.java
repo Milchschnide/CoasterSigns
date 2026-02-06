@@ -23,20 +23,33 @@ public class StationSign extends TrainCartsSignAction {
 
     @Override
     public void execute(SignActionEvent event) {
+        //Error handling if coaster does not exist, should never happen
         final Coaster coaster = CoasterCHACHE.getCoasterCHACHE().stream().filter(coaster1 ->
                 coaster1.name().equals(event.getLine(2))).findFirst().orElse(null);
         if (coaster == null) throw new RuntimeException("Big stress, pls report!");
 
         final MinecartGroup group = event.getGroup();
+        group.getActions().launchReset();
         if (event.isAction(SignActionType.GROUP_ENTER)) {
+            // Set the train in station to prevent other trains from entering the station
             coaster.setTrainInStation(event.getMember());
             coaster.addPassThrough();
 
-            if(coaster.passThroughStation()) return;
+            // Set cooldown to prevent that players get countdown messages when they enter the station
+            coaster.setCooldown(true);
+
+            // If the train should pass through the station without stopping
+            if (coaster.passThroughStation()) {
+                return;
+            }
 
             final Station station = new Station(event);
             station.centerTrain();
 
+            // Disable physiks
+            group.getProperties().setSlowingDown(coaster.slowdownWhenEnter());
+
+            // Set the block direction to the station's next direction if it hasn't been set yet
             if (coaster.getDirection() == null) coaster.setDirection(station.getNextDirectionFace());
 
             //warte bis der zug steht
@@ -50,12 +63,15 @@ public class StationSign extends TrainCartsSignAction {
                     group.eject();
 
                     //Task beenden
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance, () -> {
+                        coaster.setCooldown(false);
+                    },5);
                     Bukkit.getScheduler().cancelTask(task[0]);
                 }
             }, 0, 5);
 
         } else if (event.isAction(SignActionType.GROUP_UPDATE)) {
-            if (group.hasPassenger()) {
+            if (group.hasPassenger() && !coaster.isCooldown()) {
                 if (coaster.getCountDownHandler().isRunning()) return;
                 coaster.startCountDown(group, false, 0);
             } else {
@@ -64,6 +80,12 @@ public class StationSign extends TrainCartsSignAction {
         }
     }
 
+    /**
+     * Checks if there is a train waiting to enter the first block of the coaster and starts the station countdown if there is.
+     *
+     * @param coaster The coaster to check for waiting trains.
+     * @param group   The minecart group that just entered the station.
+     */
     private void checkPreviouseBlock(Coaster coaster, MinecartGroup group) {
         if (!coaster.getBlocks().isEmpty()) {
             if (coaster.getBlocks().getFirst().isTrainWaitingToEnter()) {
@@ -83,6 +105,7 @@ public class StationSign extends TrainCartsSignAction {
 
     @Override
     public void destroy(SignActionEvent event) {
+        System.out.println("Station sign for coaster " + event.getLine(2) + " was destroyed!");
         final Coaster coaster = CoasterCHACHE.getCoasterCHACHE().stream().filter(coaster1 ->
                 coaster1.name().equals(event.getLine(2))).findFirst().orElse(null);
         if (coaster == null) {
@@ -102,6 +125,13 @@ public class StationSign extends TrainCartsSignAction {
         super.loadedChanged(event, initCoaster(event, null));
     }
 
+    /**
+     * Initializes a coaster based on the sign's configuration.
+     *
+     * @param event  The sign action event containing the sign's information.
+     * @param player The player who is building the sign (can be null when loading).
+     * @return true if the coaster was successfully initialized, false otherwise.
+     */
     private boolean initCoaster(SignActionEvent event, Player player) {
         String name = null;
         org.bukkit.block.Block block = null;
@@ -178,11 +208,54 @@ public class StationSign extends TrainCartsSignAction {
             }
         }
 
-        if (extraLinesBelow != null && extraLinesBelow.length == 2 && !extraLinesBelow[1].isEmpty()) {
+        if (extraLinesBelow != null && extraLinesBelow.length >= 2 && extraLinesBelow[1] != null && !extraLinesBelow[1].isEmpty()) {
             SignUtilsHandler.checkPosibleLaunch(player, config, extraLinesBelow[1].split(","));
         }
 
         final Coaster coaster = new Coaster(name, config, direction).init();
+
+        if (extraLinesBelow != null && extraLinesBelow.length >= 3 && extraLinesBelow[2] != null && !extraLinesBelow[2].isEmpty()) {
+            final String[] line7 = extraLinesBelow[2].split(",");
+            if (line7.length == 1) {
+                int enableSlowdownWhenEnter = 0;
+                try {
+                    enableSlowdownWhenEnter = Integer.parseInt(line7[0]);
+                } catch (NumberFormatException e) {
+                    SignUtilsHandler.sendMessage(player, "Invalid value for slowdown on line 7! " +
+                            "Expected a numeric value (0 or 1).");
+                    return false;
+                }
+                if (enableSlowdownWhenEnter == 1) {
+                    coaster.setSlowdownWhenEnter(true);
+                    coaster.setSlowdownWhenExit(true);
+                }
+            } else if (line7.length == 2) {
+                int enableSlowdownWhenEnter = 0;
+                int enableSlowdownWhenExit = 0;
+                try {
+                    enableSlowdownWhenEnter = Integer.parseInt(line7[0]);
+                } catch (NumberFormatException e) {
+                    SignUtilsHandler.sendMessage(player, "Invalid value for slowdown when enter on line 7! " +
+                            "Expected a numeric value (0 or 1).");
+                    return false;
+                }
+                try {
+                    enableSlowdownWhenExit = Integer.parseInt(line7[1]);
+                } catch (NumberFormatException e) {
+                    SignUtilsHandler.sendMessage(player, "Invalid value for slowdown when exit on line 7! " +
+                            "Expected a numeric value (0 or 1).");
+                    return false;
+                }
+                if (enableSlowdownWhenEnter == 1) coaster.setSlowdownWhenEnter(true);
+                if (enableSlowdownWhenExit == 1) coaster.setSlowdownWhenExit(true);
+            } else {
+                SignUtilsHandler.sendMessage(player, "Invalid parameters on line 7! Expected format: " +
+                        "EnalbeSlowdownWhenEnter or EnableSlowdownWhenEnter,EnableSlowdownWhenExit");
+                return false;
+            }
+
+        }
+
         if (block != null) coaster.setBlock(block);
         if (passThrow != 0) coaster.setPassThroughs(passThrow);
         return true;
