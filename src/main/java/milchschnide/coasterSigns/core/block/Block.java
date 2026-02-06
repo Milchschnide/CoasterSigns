@@ -24,6 +24,7 @@ public class Block {
     private MinecartMember<?> trainWaitingToEnter = null;
     @Setter
     private BlockFace direction;
+
     @Setter
     @Getter
     private boolean hasSlowdownBeenEnabled = false;

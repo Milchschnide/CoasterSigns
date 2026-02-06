@@ -1,6 +1,7 @@
 package milchschnide.coasterSigns.signs.utils;
 
 import com.bergerkiller.bukkit.tc.Station;
+import com.bergerkiller.bukkit.tc.events.SignActionEvent;
 import milchschnide.coasterSigns.utils.Color;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
