@@ -25,7 +25,7 @@ public class BlockSign extends SignAction {
 
     @Override
     public boolean match(SignActionEvent event) {
-        if(CoasterSigns.collectblocks) posibleBlocks.add(event);
+        if (CoasterSigns.collectblocks) posibleBlocks.add(event);
         return isblockSign(event);
     }
 
@@ -54,8 +54,8 @@ public class BlockSign extends SignAction {
             final MinecartGroup group = event.getGroup();
             final TrainProperties properties = group.getProperties();
 
-            if(properties.isSlowingDown(SlowdownMode.FRICTION)
-            || properties.isSlowingDown(SlowdownMode.GRAVITY)) block.setHasSlowdownBeenEnabled(true);
+            if (properties.isSlowingDown(SlowdownMode.FRICTION)
+                    || properties.isSlowingDown(SlowdownMode.GRAVITY)) block.setHasSlowdownBeenEnabled(true);
 
             // Set the block direction to the station's next direction if it hasn't been set yet
             final Station station = new Station(event);
@@ -63,7 +63,10 @@ public class BlockSign extends SignAction {
 
             // if the last dispatched train enters the fitst block again,
             // reset the last dispatched train to allow further trains to be dispatched from the station
-            if(event.getMember() == coaster.getLastDispatchedTrain()) coaster.setLastDispatchedTrain(null);
+            if (event.getMember() == coaster.getLastDispatchedTrain()) {
+                System.out.println("set last dispatched train to null");
+                coaster.setLastDispatchedTrain(null);
+            }
 
             if (block.isTrainInBlock()) {
                 // If a train is already in the block, set the waiting train
@@ -146,7 +149,7 @@ public class BlockSign extends SignAction {
             SignUtilsHandler.sendMessage(player, " Invalid block index on line 3! It must be a number.");
             return false;
         }
-        if(coaster.getBlocks().stream().anyMatch(block -> block.getIndex() == index)) {
+        if (coaster.getBlocks().stream().anyMatch(block -> block.getIndex() == index)) {
             return false;
         }
         if (coaster.getBlocks().stream().anyMatch(block1 -> block1.getIndex() == index)) {

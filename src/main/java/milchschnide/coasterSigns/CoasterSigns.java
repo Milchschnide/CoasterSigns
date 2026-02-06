@@ -49,13 +49,12 @@ public final class CoasterSigns extends JavaPlugin {
     public void onEnable() {
         System.out.println("Load Blocks");
         Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> {
-            collectblocks = false;
             BlockSign.posibleBlocks.forEach(block -> {
                 if (!blockSign.isblockSign(block)) return;
                 blockSign.loadedChanged(block, false);
             });
         }, 5);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> collectblocks = false, 20);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> collectblocks = false, 40);
         System.out.println("Loaded Blocks");
 
 

@@ -49,7 +49,7 @@ public class CountDownHandler {
             return;
         }
         Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance, () -> {
-            if (!isCountingDown) return;
+            if (!isCountingDown || isForcedToStop) return;
             if (coaster.getLastDispatchedTrain() != null) {
                 waitTillNextBlockIsFree(group, finalMaxTimeToWait);
             } else {

@@ -138,9 +138,13 @@ public class Coaster {
      */
     public void launchTrain() {
         if (trainInStation == null) return;
+        if(lastDispatchedTrain != null) return;
+        if (!blocks.isEmpty()) {
+            System.out.println("set last dispatched train train");
+            lastDispatchedTrain = trainInStation;
+        }
         trainInStation.getActions()
                 .addActionLaunch(direction, stationConfig.getLaunchConfig(), stationConfig.getLaunchSpeed());
-        if(!blocks.isEmpty()) lastDispatchedTrain = trainInStation;
         Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance,
                 this::clearPreviousBlocks, CoasterSigns.defaultPreviousBlockLaunchDelay);
         trainInStation.getGroup().getProperties().setSlowingDown(slowdownWhenExit);
@@ -172,8 +176,9 @@ public class Coaster {
      */
     public void startCountDown(MinecartGroup group, boolean forceStart, int i) {
         if (lastDispatchedTrain != null) {
-            countDownHandler.sendActionBarMessage(group,
-                    Component.text(CoasterSigns.defaultNextBlockIsOccupiedMessage));
+            Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance, () ->
+                    countDownHandler.sendActionBarMessage(group,
+                            Component.text(CoasterSigns.defaultNextBlockIsOccupiedMessage)),5);
             if (!forceStart) return;
             final int finalI = i++;
             if (finalI > 180) {
@@ -183,7 +188,7 @@ public class Coaster {
             }
             Bukkit.getScheduler().scheduleSyncDelayedTask(CoasterSigns.instance, () -> {
                 startCountDown(group, forceStart, finalI);
-            },20);
+            }, 20);
             return;
         }
         if (!isTrainInStation()) return;

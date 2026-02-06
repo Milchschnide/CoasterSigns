@@ -181,7 +181,6 @@ public class StationSign extends SignAction {
             if (line5.length > 0 && !line5[0].isEmpty()) {
                 if (line5.length == 1) {
                     try {
-                        System.out.println(line5[0].toUpperCase());
                         direction = BlockFace.valueOf(line5[0].toUpperCase());
                     } catch (IllegalArgumentException e) {
                         SignUtilsHandler.sendMessage(player, "Invalid direction on line 5! " +
