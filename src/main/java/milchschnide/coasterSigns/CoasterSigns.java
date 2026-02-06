@@ -1,8 +1,12 @@
 package milchschnide.coasterSigns;
 
+import com.bergerkiller.bukkit.coasters.TCCoasters;
 import com.bergerkiller.bukkit.tc.signactions.SignAction;
+import lombok.Getter;
 import milchschnide.coasterSigns.signs.*;
 import milchschnide.coasterSigns.utils.ConfigHandler;
+import milchschnide.coasterSigns.utils.MineCartRemovalHandler;
+import milchschnide.coasterSigns.utils.PowerStateHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,6 +14,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class CoasterSigns extends JavaPlugin {
 
     public static CoasterSigns instance;
+
+    public static TCCoasters tcCoasters;
 
     public static World world;
 
@@ -47,6 +53,8 @@ public final class CoasterSigns extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        tcCoasters = TCCoasters.getPlugin(TCCoasters.class);
+
         System.out.println("Load Blocks");
         Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> {
             BlockSign.posibleBlocks.forEach(block -> {
@@ -74,6 +82,9 @@ public final class CoasterSigns extends JavaPlugin {
         SignAction.register(stationSign);
         SignAction.register(blockSign);
         System.out.println("Loaded CoasterSigns");
+
+        System.out.println("spawn trains in 3 seconds");
+        Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> PowerStateHandler.power("spawnTrains"),60);
     }
 
     @Override
@@ -100,6 +111,7 @@ public final class CoasterSigns extends JavaPlugin {
     public void onDisable() {
         SignAction.unregister(stationSign);
         SignAction.unregister(blockSign);
+        MineCartRemovalHandler.init();
     }
 
 }
